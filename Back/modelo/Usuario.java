@@ -1,4 +1,4 @@
-package Back;
+package Back.modelo;
 
 public class Usuario {
     int id;

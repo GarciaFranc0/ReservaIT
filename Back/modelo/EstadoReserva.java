@@ -1,4 +1,4 @@
-package Back;
+package Back.modelo;
 
 public enum EstadoReserva {
     PENDIENTE,

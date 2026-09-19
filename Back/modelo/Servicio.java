@@ -1,14 +1,14 @@
-package Back;
+package Back.modelo;
 
 public class Servicio {
     int id;
     String nombre;
     String descripcion;
     int duracionMinutos;
-    int precio;
+    double precio;
     boolean activo;
 
-public Servicio(int id, String nombre, String descripcion, int duracionMinutos, int precio, boolean activo) {
+public Servicio(int id, String nombre, String descripcion, int duracionMinutos, double precio, boolean activo) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -33,7 +33,7 @@ public int getId() {
         return duracionMinutos;
     }
 
-    public int getPrecio() {
+    public double getPrecio() {
         return precio;
     }
 
