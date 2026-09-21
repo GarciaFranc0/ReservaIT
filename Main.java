@@ -1,17 +1,23 @@
-import Back.dao.HorarioAtencionDAO;
-import Back.modelo.HorarioAtencion;
+import Back.servicio.ReservaService;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        HorarioAtencionDAO horarioDAO = new HorarioAtencionDAO();
-        int diaHoy = LocalDate.now().getDayOfWeek().getValue(); 
-        HorarioAtencion horarioHoy = horarioDAO.obtenerPorDia(diaHoy);
+        ReservaService reservaService = new ReservaService();
+        int servicioId = 1;
+        LocalDate fechaConsulta = LocalDate.now().plusDays(1);
+        int duracionMinutos = 60;
+        List<LocalTime> turnosLibres = reservaService.obtenerHorariosDisponibles(servicioId, fechaConsulta, duracionMinutos);
 
-        if (horarioHoy != null) {
-            System.out.println("El complejo atiende hoy de " + horarioHoy.getHoraApertura() + " a " + horarioHoy.getHoraCierre() + " hs.");
+        System.out.println("--- TURNOS DISPONIBLES PARA EL " + fechaConsulta + " ---");
+        if (turnosLibres.isEmpty()) {
+            System.out.println("No hay turnos disponibles o el complejo esta cerrado.");
         } else {
-            System.out.println("El complejo se encuentra cerrado el dia de hoy.");
+            for (LocalTime hora : turnosLibres) {
+                System.out.println(" Turno libre a las: " + hora + " hs");
+            }
         }
     }
 }
