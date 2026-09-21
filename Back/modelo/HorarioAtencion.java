@@ -1,40 +1,61 @@
 package Back.modelo;
 
-import java.time.*;;
+import java.time.LocalTime;
 
 public class HorarioAtencion {
-    int id;
-    DayOfWeek dia;
-    LocalTime horaInicio;
-    LocalTime horaFin;
-    boolean activo;
+    private int id;
+    private int diaSemana;
+    private LocalTime horaApertura;
+    private LocalTime horaCierre;
+    private boolean abierto;
 
-    public HorarioAtencion(int id, DayOfWeek dia, LocalTime horaInicio, LocalTime horaFin, boolean activo) {
+    public HorarioAtencion() {}
+
+    public HorarioAtencion(int id, int diaSemana, LocalTime horaApertura, LocalTime horaCierre, boolean abierto) {
         this.id = id;
-        this.dia = dia;
-        this.horaInicio = horaInicio;
-        this.horaFin = horaFin;
-        this.activo = activo;
+        this.diaSemana = diaSemana;
+        this.horaApertura = horaApertura;
+        this.horaCierre = horaCierre;
+        this.abierto = abierto;
     }
 
     public int getId() {
         return id;
     }
 
-    public DayOfWeek getDia() {
-        return dia;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public LocalTime getHoraInicio() {
-        return horaInicio;
+    public int getDiaSemana() {
+        return diaSemana;
     }
 
-    public LocalTime getHoraFin() {
-        return horaFin;
+    public void setDiaSemana(int diaSemana) {
+        this.diaSemana = diaSemana;
     }
 
-    public boolean isActivo() {
-        return activo;
+    public LocalTime getHoraApertura() {
+        return horaApertura;
     }
 
+    public void setHoraApertura(LocalTime horaApertura) {
+        this.horaApertura = horaApertura;
+    }
+
+    public LocalTime getHoraCierre() {
+        return horaCierre;
+    }
+
+    public void setHoraCierre(LocalTime horaCierre) {
+        this.horaCierre = horaCierre;
+    }
+
+    public boolean isAbierto() {
+        return abierto;
+    }
+
+    public void setAbierto(boolean abierto) {
+        this.abierto = abierto;
+    }
 }
