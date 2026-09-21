@@ -35,7 +35,7 @@ public class UsuarioDAO {
             System.err.println("Error al buscar usuario por correo: " + e.getMessage());
         }
 
-        return null; // Retorna null si no se encontro el usuario
+        return null;
     }
 
 
@@ -53,7 +53,6 @@ public class UsuarioDAO {
             int filasAfectadas = stmt.executeUpdate();
 
             if (filasAfectadas > 0) {
-                // Recuperar el ID autoincremental generado por SQLite
                 try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         usuario.setId(generatedKeys.getInt(1));

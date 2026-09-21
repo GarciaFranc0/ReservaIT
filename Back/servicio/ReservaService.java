@@ -2,6 +2,7 @@ package Back.servicio;
 
 import Back.dao.HorarioAtencionDAO;
 import Back.dao.ReservaDAO;
+import Back.modelo.EstadoReserva;
 import Back.modelo.HorarioAtencion;
 import Back.modelo.Reserva;
 
@@ -19,6 +20,7 @@ public class ReservaService {
         this.reservaDAO = new ReservaDAO();
         this.horarioDAO = new HorarioAtencionDAO();
     }
+    
     public List<LocalTime> obtenerHorariosDisponibles(int servicioId, LocalDate fecha, int duracionMinutos) {
         List<LocalTime> horariosDisponibles = new ArrayList<>();
 
@@ -26,24 +28,19 @@ public class ReservaService {
         HorarioAtencion horarioAtencion = horarioDAO.obtenerPorDia(diaSemana);
 
         if (horarioAtencion != null && horarioAtencion.isAbierto()) {
-            
-            String inicioDiaStr = fecha.toString() + "T00:00:00";
-            String finDiaStr = fecha.toString() + "T23:59:59";
-            
+            String inicioDiaStr = fecha.toString() + "T00:00";
+            String finDiaStr = fecha.toString() + "T23:59:59.999"; 
             List<Reserva> reservasOcupadas = reservaDAO.obtenerReservasPorCanchaYFecha(servicioId, inicioDiaStr, finDiaStr);
-
             LocalDateTime slotActual = LocalDateTime.of(fecha, horarioAtencion.getHoraApertura());
             LocalDateTime limiteCierre = LocalDateTime.of(fecha, horarioAtencion.getHoraCierre());
 
             while (slotActual.plusMinutes(duracionMinutos).isBefore(limiteCierre) || slotActual.plusMinutes(duracionMinutos).isEqual(limiteCierre)) {
                 LocalDateTime finSlot = slotActual.plusMinutes(duracionMinutos);
-
                 boolean estaOcupado = false;
                 int i = 0;
                 while (i < reservasOcupadas.size() && !estaOcupado) {
                     Reserva reserva = reservasOcupadas.get(i);
-                    boolean solapa = slotActual.isBefore(reserva.getFechaHoraFin()) && 
-                                     finSlot.isAfter(reserva.getFechaHoraInicio());
+                    boolean solapa = slotActual.isBefore(reserva.getFechaHoraFin()) && finSlot.isAfter(reserva.getFechaHoraInicio());
                     if (solapa) {
                         estaOcupado = true;
                     }
@@ -57,4 +54,23 @@ public class ReservaService {
         }
         return horariosDisponibles;
     }
+
+    public Reserva buscarReservaPorCodigo(String codigo) {
+        Reserva reserva = null;
+        if (codigo != null && !codigo.trim().isEmpty()) {
+            reserva = reservaDAO.obtenerPorCodigo(codigo.trim().toUpperCase());
+        }
+        return reserva;
+    }
+
+    public boolean cancelarReserva(String codigo) {
+        boolean exito = false;
+        Reserva reserva = buscarReservaPorCodigo(codigo);
+
+        if (reserva != null && reserva.getEstado() != EstadoReserva.CANCELADO) {
+            exito = reservaDAO.actualizarEstado(reserva.getId(), EstadoReserva.CANCELADO);
+        }
+
+        return exito;
+    } 
 }

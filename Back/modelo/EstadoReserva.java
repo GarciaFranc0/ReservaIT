@@ -2,7 +2,7 @@ package Back.modelo;
 
 public enum EstadoReserva {
     PENDIENTE,
-    CONFIRMADO,
+    CONFIRMADA,
     COMPLETADO,
     CANCELADO
 }
