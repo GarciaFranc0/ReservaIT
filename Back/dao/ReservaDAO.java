@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,12 +49,10 @@ public class ReservaDAO {
 
     public List<Reserva> obtenerReservasPorCanchaYFecha(int servicioId, String fechaInicioDia, String fechaFinDia) {
         List<Reserva> reservas = new ArrayList<>();
-        String sql = "SELECT * FROM reservas WHERE servicio_id = ? " +
-                     "AND fecha_hora_inicio >= ? AND fecha_hora_inicio <= ? " +
-                     "AND estado IN ('PENDIENTE', 'CONFIRMADA')";
+        String sql = "SELECT * FROM reservas WHERE servicio_id = ? " + "AND fecha_hora_inicio >= ? AND fecha_hora_inicio <= ? " + "AND estado IN ('PENDIENTE', 'CONFIRMADA')";
 
         try (Connection conn = ConexionBD.obtenerConexion();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, servicioId);
             stmt.setString(2, fechaInicioDia);
@@ -65,20 +64,19 @@ public class ReservaDAO {
                     r.setId(rs.getInt("id"));
                     r.setClienteId(rs.getInt("cliente_id"));
                     r.setServicioId(rs.getInt("servicio_id"));
-                    // Se parsea desde la cadena ISO almacenada en SQLite
-                    r.setFechaHoraInicio(java.time.LocalDateTime.parse(rs.getString("fecha_hora_inicio")));
-                    r.setFechaHoraFin(java.time.LocalDateTime.parse(rs.getString("fecha_hora_fin")));
+                    String inicioStr = rs.getString("fecha_hora_inicio").replace(" ", "T");
+                    String finStr = rs.getString("fecha_hora_fin").replace(" ", "T");
+                    r.setFechaHoraInicio(LocalDateTime.parse(inicioStr));
+                    r.setFechaHoraFin(LocalDateTime.parse(finStr));
                     r.setEstado(EstadoReserva.valueOf(rs.getString("estado")));
                     r.setCodigoCancelacion(rs.getString("codigo_cancelacion"));
-
                     reservas.add(r);
                 }
             }
 
-        } catch (SQLException e) {
-            System.err.println("Error al consultar reservas ocupadas: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Error al consultar o parsear reservas ocupadas: " + e.getMessage());
         }
-
         return reservas;
     }
 

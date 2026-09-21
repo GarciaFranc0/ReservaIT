@@ -8,11 +8,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 
 public class HorarioAtencionDAO {
+    private final DateTimeFormatter FORMATO_HORA = new DateTimeFormatterBuilder()
+            .appendPattern("[HH:mm:ss][H:mm:ss][HH:mm][H:mm]")
+            .toFormatter();
 
     public HorarioAtencion obtenerPorDia(int diaSemana) {
         String sql = "SELECT * FROM horarios_atencion WHERE dia_semana = ?";
+        HorarioAtencion horario = null;
 
         try (Connection conn = ConexionBD.obtenerConexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -23,25 +29,25 @@ public class HorarioAtencionDAO {
                 if (rs.next()) {
                     boolean estaAbierto = rs.getInt("abierto") == 1;
                     
-                    if (!estaAbierto) {
-                        return null;
+                    if (estaAbierto) {
+                        horario = new HorarioAtencion();
+                        horario.setId(rs.getInt("id"));
+                        horario.setDiaSemana(rs.getInt("dia_semana"));
+                        String strApertura = rs.getString("hora_apertura").trim();
+                        String strCierre = rs.getString("hora_cierre").trim();
+                        horario.setHoraApertura(LocalTime.parse(strApertura, FORMATO_HORA));
+                        horario.setHoraCierre(LocalTime.parse(strCierre, FORMATO_HORA));
+                        horario.setAbierto(true);
                     }
-
-                    HorarioAtencion horario = new HorarioAtencion();
-                    horario.setId(rs.getInt("id"));
-                    horario.setDiaSemana(rs.getInt("dia_semana"));
-                    horario.setHoraApertura(LocalTime.parse(rs.getString("hora_apertura")));
-                    horario.setHoraCierre(LocalTime.parse(rs.getString("hora_cierre")));
-                    horario.setAbierto(true);
-
-                    return horario;
                 }
             }
 
         } catch (SQLException e) {
             System.err.println("Error al consultar horario de atencion: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Error al parsear hora de atencion: " + e.getMessage());
         }
 
-        return null;
+        return horario;
     }
 }

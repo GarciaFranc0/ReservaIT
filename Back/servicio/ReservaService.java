@@ -4,6 +4,7 @@ import Back.dao.HorarioAtencionDAO;
 import Back.dao.ReservaDAO;
 import Back.modelo.HorarioAtencion;
 import Back.modelo.Reserva;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -11,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReservaService {
-
     private final ReservaDAO reservaDAO;
     private final HorarioAtencionDAO horarioDAO;
 
@@ -19,41 +19,40 @@ public class ReservaService {
         this.reservaDAO = new ReservaDAO();
         this.horarioDAO = new HorarioAtencionDAO();
     }
-
     public List<LocalTime> obtenerHorariosDisponibles(int servicioId, LocalDate fecha, int duracionMinutos) {
         List<LocalTime> horariosDisponibles = new ArrayList<>();
+
         int diaSemana = fecha.getDayOfWeek().getValue();
         HorarioAtencion horarioAtencion = horarioDAO.obtenerPorDia(diaSemana);
 
         if (horarioAtencion != null && horarioAtencion.isAbierto()) {
-            String inicioDia = fecha.atStartOfDay().toString();
-            String finDia = fecha.atTime(LocalTime.MAX).toString();
-            List<Reserva> reservasOcupadas = reservaDAO.obtenerReservasPorCanchaYFecha(servicioId, inicioDia, finDia);
+            
+            String inicioDiaStr = fecha.toString() + "T00:00:00";
+            String finDiaStr = fecha.toString() + "T23:59:59";
+            
+            List<Reserva> reservasOcupadas = reservaDAO.obtenerReservasPorCanchaYFecha(servicioId, inicioDiaStr, finDiaStr);
 
-            LocalTime horaActual = horarioAtencion.getHoraApertura();
-            LocalTime horaCierre = horarioAtencion.getHoraCierre();
+            LocalDateTime slotActual = LocalDateTime.of(fecha, horarioAtencion.getHoraApertura());
+            LocalDateTime limiteCierre = LocalDateTime.of(fecha, horarioAtencion.getHoraCierre());
 
-            while (horaActual.plusMinutes(duracionMinutos).isBefore(horaCierre) || 
-                   horaActual.plusMinutes(duracionMinutos).equals(horaCierre)) {
+            while (slotActual.plusMinutes(duracionMinutos).isBefore(limiteCierre) || slotActual.plusMinutes(duracionMinutos).isEqual(limiteCierre)) {
+                LocalDateTime finSlot = slotActual.plusMinutes(duracionMinutos);
 
-                LocalDateTime inicioSlot = LocalDateTime.of(fecha, horaActual);
-                LocalDateTime finSlot = inicioSlot.plusMinutes(duracionMinutos);
                 boolean estaOcupado = false;
                 int i = 0;
                 while (i < reservasOcupadas.size() && !estaOcupado) {
                     Reserva reserva = reservasOcupadas.get(i);
-                    boolean solapa = inicioSlot.isBefore(reserva.getFechaHoraFin()) && 
+                    boolean solapa = slotActual.isBefore(reserva.getFechaHoraFin()) && 
                                      finSlot.isAfter(reserva.getFechaHoraInicio());
                     if (solapa) {
                         estaOcupado = true;
                     }
                     i++;
                 }
-
                 if (!estaOcupado) {
-                    horariosDisponibles.add(horaActual);
+                    horariosDisponibles.add(slotActual.toLocalTime());
                 }
-                horaActual = horaActual.plusMinutes(duracionMinutos);
+                slotActual = slotActual.plusMinutes(duracionMinutos);
             }
         }
         return horariosDisponibles;
