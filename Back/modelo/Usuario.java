@@ -9,7 +9,7 @@ public class Usuario {
 
     
 
-public Usuario(int id, String nombre, String apellido, String correo, String telefono) {
+    public Usuario(int id, String nombre, String apellido, String correo, String telefono) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -17,8 +17,12 @@ public Usuario(int id, String nombre, String apellido, String correo, String tel
         this.telefono = telefono;
     }
 
-public int getId() {
+    public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getNombre() {
@@ -31,5 +35,9 @@ public int getId() {
 
     public String getCorreo() {
         return correo;
+    }
+
+    public String getTelefono() {
+        return telefono;
     }
 }

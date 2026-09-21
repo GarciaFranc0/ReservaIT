@@ -1,21 +1,19 @@
-import Back.dao.ServicioDAO;
-import Back.modelo.Servicio;
-import java.util.List;
+import Back.dao.UsuarioDAO;
+import Back.modelo.Usuario;
 
 public class Main {
     public static void main(String[] args) {
-        ServicioDAO servicioDAO = new ServicioDAO();
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
 
-        Servicio cancha1 = new Servicio(0, "Cancha 1 - Fútbol 5", "Sintético techado con iluminación LED", 60, 15000.0, true);
-        Servicio cancha2 = new Servicio(0, "Cancha 2 - Fútbol 7", "Césped natural al aire libre", 60, 22000.0, true);
+        Usuario cliente = new Usuario(0, "Juan", "Pérez", "juan.perez@email.com", "1122334455");
+        Usuario clienteGuardado = usuarioDAO.obtenerOCrear(cliente);
 
-        servicioDAO.guardar(cancha1);
-        servicioDAO.guardar(cancha2);
-
-        List<Servicio> lista = servicioDAO.obtenerTodosActivos();
-        System.out.println("--- CANCHAS DISPONIBLES EN LA BASE DE DATOS ---");
-        for (Servicio s : lista) {
-            System.out.println("ID: " + s.getId() + " | " + s.getNombre() + " | Precio: $" + s.getPrecio());
+        if (clienteGuardado != null) {
+            System.out.println("Cliente registrado/encontrado con ID: " + clienteGuardado.getId());
+            System.out.println("Nombre: " + clienteGuardado.getNombre() + " " + clienteGuardado.getApellido());
+            System.out.println("Correo: " + clienteGuardado.getCorreo());
+        } else {
+            System.out.println("No se pudo procesar el registro del cliente.");
         }
     }
 }

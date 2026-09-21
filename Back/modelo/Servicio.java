@@ -8,7 +8,7 @@ public class Servicio {
     double precio;
     boolean activo;
 
-public Servicio(int id, String nombre, String descripcion, int duracionMinutos, double precio, boolean activo) {
+    public Servicio(int id, String nombre, String descripcion, int duracionMinutos, double precio, boolean activo) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -17,7 +17,7 @@ public Servicio(int id, String nombre, String descripcion, int duracionMinutos, 
         this.activo = activo;
     }
 
-public int getId() {
+    public int getId() {
         return id;
     }
 
