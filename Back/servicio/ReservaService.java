@@ -33,21 +33,25 @@ public class ReservaService {
             List<Reserva> reservasOcupadas = reservaDAO.obtenerReservasPorCanchaYFecha(servicioId, inicioDiaStr, finDiaStr);
             LocalDateTime slotActual = LocalDateTime.of(fecha, horarioAtencion.getHoraApertura());
             LocalDateTime limiteCierre = LocalDateTime.of(fecha, horarioAtencion.getHoraCierre());
+            LocalDateTime ahora = LocalDateTime.now();
 
             while (slotActual.plusMinutes(duracionMinutos).isBefore(limiteCierre) || slotActual.plusMinutes(duracionMinutos).isEqual(limiteCierre)) {
                 LocalDateTime finSlot = slotActual.plusMinutes(duracionMinutos);
                 boolean estaOcupado = false;
-                int i = 0;
-                while (i < reservasOcupadas.size() && !estaOcupado) {
-                    Reserva reserva = reservasOcupadas.get(i);
-                    boolean solapa = slotActual.isBefore(reserva.getFechaHoraFin()) && finSlot.isAfter(reserva.getFechaHoraInicio());
-                    if (solapa) {
-                        estaOcupado = true;
+                
+                if (slotActual.isAfter(ahora)) {
+                    int i = 0;
+                    while (i < reservasOcupadas.size() && !estaOcupado) {
+                        Reserva reserva = reservasOcupadas.get(i);
+                        boolean solapa = slotActual.isBefore(reserva.getFechaHoraFin()) && finSlot.isAfter(reserva.getFechaHoraInicio());
+                        if (solapa) {
+                            estaOcupado = true;
+                        }
+                        i++;
                     }
-                    i++;
-                }
-                if (!estaOcupado) {
-                    horariosDisponibles.add(slotActual.toLocalTime());
+                    if (!estaOcupado) {
+                        horariosDisponibles.add(slotActual.toLocalTime());
+                    }
                 }
                 slotActual = slotActual.plusMinutes(duracionMinutos);
             }
