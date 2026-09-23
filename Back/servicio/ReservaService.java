@@ -59,6 +59,37 @@ public class ReservaService {
         return horariosDisponibles;
     }
 
+    public boolean crearReserva(Reserva reserva) {
+        boolean creada = false;
+        
+        if (reserva != null && reserva.getFechaHoraInicio() != null && reserva.getFechaHoraFin() != null) {
+            LocalDate fecha = reserva.getFechaHoraInicio().toLocalDate();
+            int diaSemana = fecha.getDayOfWeek().getValue();
+            HorarioAtencion horarioAtencion = horarioDAO.obtenerPorDia(diaSemana);
+
+            if (horarioAtencion != null && horarioAtencion.isAbierto()) {
+                LocalDateTime aperturaDia = LocalDateTime.of(fecha, horarioAtencion.getHoraApertura());
+                LocalDateTime cierreDia = LocalDateTime.of(fecha, horarioAtencion.getHoraCierre());
+                LocalDateTime ahora = LocalDateTime.now();
+
+                boolean esValidoEnHorario = (reserva.getFechaHoraInicio().isEqual(aperturaDia) || reserva.getFechaHoraInicio().isAfter(aperturaDia)) &&
+                                            (reserva.getFechaHoraFin().isEqual(cierreDia) || reserva.getFechaHoraFin().isBefore(cierreDia) || reserva.getFechaHoraFin().isEqual(cierreDia));
+                
+                boolean esFuturo = reserva.getFechaHoraInicio().isAfter(ahora);
+
+                if (esValidoEnHorario && esFuturo) {
+                    List<LocalTime> disponibles = obtenerHorariosDisponibles(reserva.getServicioId(), fecha, (int) java.time.Duration.between(reserva.getFechaHoraInicio(), reserva.getFechaHoraFin()).toMinutes());
+                    LocalTime horaInicioSolicitada = reserva.getFechaHoraInicio().toLocalTime();
+
+                    if (disponibles.contains(horaInicioSolicitada)) {
+                        creada = reservaDAO.guardar(reserva);
+                    }
+                }
+            }
+        }
+        return creada;
+    }
+
     public Reserva buscarReservaPorCodigo(String codigo) {
         Reserva reserva = null;
         if (codigo != null && !codigo.trim().isEmpty()) {
