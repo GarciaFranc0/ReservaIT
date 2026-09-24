@@ -7,10 +7,54 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div>
-        <h1>ReservaIT</h1>
-        <p>Bienvenido a ReservaIT</p>
-    </div>
+    <h1>Reservar Turno</h1>
+
+    <form id="form-reserva">
+        <label>Nombre:</label>
+        <input type="text" id="input-nombre" required>
+
+        <label>Apellido:</label>
+        <input type="text" id="input-apellido" required>
+
+        <label>Correo:</label>
+        <input type="email" id="input-correo" required>
+
+        <label>Teléfono:</label>
+        <input type="text" id="input-telefono" required>
+
+        <label>Fecha:</label>
+        <input type="date" id="input-fecha" required>
+
+        <label>Tipo de Cancha:</label>
+        <select id="select-servicio" required></select>
+
+        <label>Horarios disponibles:</label>
+        <select id="select-horarios" required></select>
+
+        <button type="submit">Confirmar Reserva</button>
+    </form>
+
+    <hr>
+
+    <h3>Reservas Registradas</h3>
+    <table border="1" id="tabla-reservas">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Fecha y Hora</th>
+                <th>Estado</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Se llenará dinámicamente -->
+        </tbody>
+    </table>
+
+    <h3>Cancelar una Reserva</h3>
+    <input type="text" id="input-codigo-cancelar" placeholder="Código de cancelación">
+    <button id="btn-cancelar">Cancelar Turno</button>
+
     <script src="script.js"></script>
 </body>
 </html>
