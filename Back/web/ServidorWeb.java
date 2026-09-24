@@ -200,12 +200,12 @@ public class ServidorWeb {
                 exchange.sendResponseHeaders(204, -1);
             } else {
                 if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
-                    byte[] bytesBody = leerBytes(exchange.getRequestBody());
-                    String body = new String(bytesBody, StandardCharsets.UTF_8);
-                    Map<String, String> datos = parsearQuery(body);
+                    String query = exchange.getRequestURI().getQuery(); 
+                    Map<String, String> datos = parsearQuery(query);
                     String codigo = datos.getOrDefault("codigo", "");
 
                     boolean cancelado = reservaService.cancelarReserva(codigo);
+                    
 
                     String jsonRespuesta = "{\"cancelado\": " + cancelado + "}";
                     byte[] respuesta = jsonRespuesta.getBytes(StandardCharsets.UTF_8);

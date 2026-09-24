@@ -31,6 +31,7 @@ public class ReservaService {
             String inicioDiaStr = fecha.toString() + "T00:00";
             String finDiaStr = fecha.toString() + "T23:59:59.999"; 
             List<Reserva> reservasOcupadas = reservaDAO.obtenerReservasPorCanchaYFecha(servicioId, inicioDiaStr, finDiaStr);
+            reservasOcupadas.removeIf(r -> r.getEstado() != null && r.getEstado().name().equals("CANCELADO"));
             LocalDateTime slotActual = LocalDateTime.of(fecha, horarioAtencion.getHoraApertura());
             LocalDateTime limiteCierre = LocalDateTime.of(fecha, horarioAtencion.getHoraCierre());
             LocalDateTime ahora = LocalDateTime.now();

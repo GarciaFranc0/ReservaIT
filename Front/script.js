@@ -1,3 +1,7 @@
+window.cancelarReserva = function(codigo) {
+    alert("¡Hola! La función funciona perfectamente para la reserva: " + codigo);
+};
+
 async function cargarHorarios() {
     const servicioId = document.getElementById('select-servicio').value || 1;
     const fechaInput = document.getElementById('input-fecha');
@@ -26,7 +30,11 @@ async function cargarHorarios() {
     }
 }
 
-async function enviarReserva(datosReserva) {
+async function enviarReserva(event, datosReserva) {
+    if (event && typeof event.preventDefault === 'function') {
+        event.preventDefault();
+    }
+
     try {
         const respuesta = await fetch('http://localhost:8080/api/reservas', {
             method: 'POST',
@@ -35,38 +43,49 @@ async function enviarReserva(datosReserva) {
             },
             body: new URLSearchParams(datosReserva)
         });
-        
+
         const resultado = await respuesta.json();
+        console.log("Respuesta completa del servidor:", resultado);
+        
         if (resultado.exito) {
-            alert("¡Reserva creada con éxito! Tu código de cancelación es: " + resultado.codigo);
-            cargarReservas();
+            const codigo = resultado.codigo;
+            // Guardamos el éxito y el código en el navegador
+            localStorage.setItem("reservaExitosa", "true");
+            localStorage.setItem("codigoReserva", codigo);
+            localStorage.setItem("telefonoReserva", datosReserva.telefono);
+            localStorage.setItem("nombreReserva", datosReserva.nombre);
+            localStorage.setItem("fechaReserva", datosReserva.fechaHoraInicio);
+
+            // Dejamos que recargue si quiere, pero ahora los datos están seguros
+            location.reload();
         } else {
             alert("No se pudo completar la reserva. El horario ya no está disponible.");
         }
+
     } catch (error) {
-        console.error("Error al enviar la reserva:", error);
+        console.error("¡ERROR CAPTURADO EN EL CATCH!:", error);
+        alert("Hubo un error de conexión. Revisá la consola (F12).");
     }
 }
 
 async function cancelarReserva(codigo) {
-    if (!confirm("¿Estás seguro de que querés cancelar la reserva con código " + codigo + "?")) {
+    if (!confirm("¿Estás seguro de que querés cancelar la reserva " + codigo + "?")) {
         return;
     }
     try {
         const respuesta = await fetch(`http://localhost:8080/api/cancelar?codigo=${codigo}`, {
             method: 'POST'
-        });
-        
+        }); 
         const resultado = await respuesta.json();
         
         if (resultado.exito || respuesta.ok) {
             alert("¡Reserva cancelada con éxito!");
             cargarReservas();
         } else {
-            alert("No se pudo procesar la cancelación.");
+            alert("No se pudo cancelar la reserva.");
         }
     } catch (error) {
-        console.error("Error en la petición de cancelación:", error);
+        console.error("Error al cancelar:", error);
     }
 }
 
@@ -77,21 +96,21 @@ if (inputFecha) {
     cargarHorarios(); 
 }
 
-const formReserva = document.getElementById('form-reserva');
-if (formReserva) {
-    formReserva.addEventListener('submit', function(e) {
-        e.preventDefault();
-
+const btnEnviar = document.getElementById('btn-enviar-reserva');
+if (btnEnviar) {
+    btnEnviar.addEventListener('click', function(e) {
+        console.log("--> 1. El botón fue presionado, la página NO debería recargarse.");
+        debugger;
         const datosReserva = {
             nombre: document.getElementById('input-nombre').value,
             apellido: document.getElementById('input-apellido').value,
             correo: document.getElementById('input-correo').value,
             telefono: document.getElementById('input-telefono').value,
-            servicioId: 1,
+            servicioId: parseInt(document.getElementById('select-servicio').value) || 1,
             fechaHoraInicio: document.getElementById('input-fecha').value + 'T' + document.getElementById('select-horarios').value
         };
 
-        enviarReserva(datosReserva);
+        enviarReserva(null, datosReserva);
     });
 }
 const btnCancelar = document.getElementById('btn-cancelar');
@@ -104,13 +123,13 @@ if (btnCancelar) {
             alert("Por favor, ingresá un código de cancelación.");
         }
     });
-
+}
     async function cargarReservas() {
     try {
         const respuesta = await fetch('http://localhost:8080/api/listar');
         const reservas = await respuesta.json();
-        
-        const tbody = document.querySelector('table tbody') || document.querySelector('table'); 
+
+        const tbody = document.querySelector('table tbody') || document.querySelector('table');
         if (tbody) {
             let html = `
                 <tr>
@@ -120,10 +139,14 @@ if (btnCancelar) {
                     <th>Acción</th>
                 </tr>
             `;
-            
+
             let i = 0;
             while (i < reservas.length) {
                 const r = reservas[i];
+                
+                if (r.estado === 'CANCELADO') { i++; continue; }
+                
+
                 html += `
                     <tr>
                         <td>${r.codigo}</td>
@@ -190,13 +213,85 @@ async function cargarServicios() {
     }
 }
 
+function enviarWhatsApp(datos, codigo) {
+    const telefono = datos.telefono || "";
+    const nombre = datos.nombre || "Cliente";
+    const fechaHora = datos.fechaHoraInicio || "Fecha y hora"; 
+
+    if (!telefono) return;
+
+    const mensaje = `¡Hola *${nombre}*! 👋 Te confirmamos tu reserva. 🏟️\n\n` +
+                    `📅 *Fecha y Hora:* ${fechaHora}\n` +
+                    `🔑 *Código de cancelación:* ${codigo}\n\n` +
+                    `¡Te esperamos!`;
+
+    const telefonoLimpiado = telefono.replace(/\D/g, '');
+    const urlWhatsApp = `https://wa.me/${telefonoLimpiado}?text=${encodeURIComponent(mensaje)}`;
+    
+    let bannerWpp = document.getElementById('banner-whatsapp-flotante');
+    if (!bannerWpp) {
+        bannerWpp = document.createElement('div');
+        bannerWpp.id = 'banner-whatsapp-flotante';
+        bannerWpp.style.cssText = "position: fixed; bottom: 20px; right: 20px; background: #ffffff; border: 3px solid #25d366; padding: 20px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.3); z-index: 999999; text-align: max-content; max-width: 320px;";
+        document.body.appendChild(bannerWpp);
+    }
+
+    bannerWpp.innerHTML = `
+        <p style="margin: 0 0 5px 0; font-weight: bold; color: #137333; font-size: 15px;">¡Reserva creada con éxito! 🎉</p>
+        <p style="margin: 0 0 12px 0; font-size: 13px; color: #555;">Tu código es: <b>${codigo}</b></p>
+        <a href="${urlWhatsApp}" target="_blank" style="background: #25d366; color: white; padding: 10px 15px; text-decoration: none; border-radius: 6px; display: block; text-align: center; font-weight: bold; font-size: 14px;">
+            💬 Enviar WhatsApp
+        </a>
+    `;
+    
+    bannerWpp.style.display = 'block';
+}
+
+window.cancelarReserva = async function(codigo) {
+    console.log("¡Se hizo clic en cancelar para el código:", codigo); 
+
+    if (!confirm("¿Estás seguro de que querés cancelar la reserva " + codigo + "?")) {
+        return;
+    }
+
+    try {
+        const respuesta = await fetch(`http://localhost:8080/api/cancelar?codigo=${codigo}`, {
+            method: 'POST'
+        });
+        
+        const resultado = await respuesta.json();
+        
+        if (resultado.cancelado) {
+            alert("¡Reserva cancelada con éxito!");
+            cargarReservas();
+        } else {
+            alert("No se pudo cancelar la reserva.");
+        }
+    } catch (error) {
+        console.error("Error al cancelar:", error);
+    }
+};
+
 document.getElementById('select-servicio').addEventListener('change', cargarHorarios);
 
 window.cancelarReservaDesdeTabla = cancelarReservaDesdeTabla;
-window.cancelarReserva = cancelarReserva;
+
 window.addEventListener('DOMContentLoaded', () => {
     cargarServicios();
     cargarReservas();
 });
 
-}
+document.addEventListener("DOMContentLoaded", function() {
+    if (localStorage.getItem("reservaExitosa") === "true") {
+        const codigo = localStorage.getItem("codigoReserva");
+        const telefono = localStorage.getItem("telefonoReserva");
+        const nombre = localStorage.getItem("nombreReserva");
+        const fechaHora = localStorage.getItem("fechaReserva");
+
+        // Dibujamos el banner flotante de WhatsApp
+        enviarWhatsApp({ nombre, telefono, fechaHoraInicio: fechaHora }, codigo);
+
+        // Limpiamos el localStorage para que el banner no vuelva a aparecer si recargas la página manualmente después
+        localStorage.removeItem("reservaExitosa");
+    }
+});

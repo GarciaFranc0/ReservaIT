@@ -7,34 +7,33 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Reservar Turno</h1>
+    <div class="form-container">
+    <h2>Reservar Turno</h2>
+    
+    <label>Nombre:</label>
+    <input type="text" id="input-nombre" required>
 
-    <form id="form-reserva">
-        <label>Nombre:</label>
-        <input type="text" id="input-nombre" required>
+    <label>Apellido:</label>
+    <input type="text" id="input-apellido" required>
 
-        <label>Apellido:</label>
-        <input type="text" id="input-apellido" required>
+    <label>Correo:</label>
+    <input type="email" id="input-correo" required>
 
-        <label>Correo:</label>
-        <input type="email" id="input-correo" required>
+    <label>Teléfono:</label>
+    <input type="text" placeholder="Ej: 5491122334455" id="input-telefono" required>
 
-        <label>Teléfono:</label>
-        <input type="text" id="input-telefono" required>
+    <label>Fecha:</label>
+    <input type="date" id="input-fecha" required>
 
-        <label>Fecha:</label>
-        <input type="date" id="input-fecha" required>
+    <label>Tipo de Cancha:</label>
+    <select id="select-servicio" required></select>
 
-        <label>Tipo de Cancha:</label>
-        <select id="select-servicio" required></select>
+    <label>Horarios disponibles:</label>
+    <select id="select-horarios" required></select>
 
-        <label>Horarios disponibles:</label>
-        <select id="select-horarios" required></select>
+    <button type="button" id="btn-enviar-reserva">Confirmar Reserva</button>
+</div>
 
-        <button type="submit">Confirmar Reserva</button>
-    </form>
-
-    <hr>
 
     <h3>Reservas Registradas</h3>
     <table border="1" id="tabla-reservas">
@@ -47,13 +46,20 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Se llenará dinámicamente -->
         </tbody>
     </table>
 
     <h3>Cancelar una Reserva</h3>
     <input type="text" id="input-codigo-cancelar" placeholder="Código de cancelación">
     <button id="btn-cancelar">Cancelar Turno</button>
+
+    
+    <div id="contenedor-whatsapp" style="display: none; margin: 20px 0; padding: 15px; background: #e6f4ea; border-radius: 8px;">
+    <p style="margin: 0 0 10px 0; font-weight: bold; color: #137333;">¡Reserva registrada con éxito!</p>
+    <a id="link-whatsapp" href="#" target="_blank" style="background: #25d366; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+        💬 Enviar confirmación por WhatsApp
+    </a>
+    </div>
 
     <script src="script.js"></script>
 </body>

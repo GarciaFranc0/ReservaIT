@@ -89,7 +89,7 @@ public class ReservaDAO {
 
     public Reserva obtenerPorCodigo(String codigo) {
         Reserva reserva = null;
-        String sql = "SELECT * FROM reservas WHERE codigo_cancelacion = ? AND estado != 'CANCELADA'";
+        String sql = "SELECT * FROM reservas WHERE codigo_cancelacion = ? AND estado != 'CANCELADO'";
 
         try (Connection conn = ConexionBD.obtenerConexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -144,7 +144,7 @@ public class ReservaDAO {
 
     public boolean cancelarPorCodigo(String codigoCancelacion) {
         boolean cancelado = false;
-        String sql = "UPDATE reservas SET estado = 'CANCELADA' WHERE codigo_cancelacion = ?";
+        String sql = "UPDATE reservas SET estado = 'CANCELADO' WHERE codigo_cancelacion = ?";
 
         try (Connection conn = ConexionBD.obtenerConexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
