@@ -162,4 +162,43 @@ public class ReservaDAO {
 
         return cancelado;
     }
+
+    public List<Reserva> obtenerTodas() {
+    List<Reserva> lista = new ArrayList<>();
+    String sql = "SELECT id, cliente_id, servicio_id, fecha_hora_inicio, fecha_hora_fin, estado, codigo_cancelacion FROM reservas";
+    
+    try (Connection conn = ConexionBD.obtenerConexion();
+         Statement stmt = conn.createStatement();
+         ResultSet rs = stmt.executeQuery(sql)) {
+        
+        boolean hayMas = rs.next();
+        while (hayMas) {
+            Reserva reserva = new Reserva();
+            reserva.setId(rs.getInt("id"));
+            reserva.setClienteId(rs.getInt("cliente_id"));
+            reserva.setServicioId(rs.getInt("servicio_id"));
+            
+            String inicioStr = rs.getString("fecha_hora_inicio");
+            if (inicioStr != null) {
+                reserva.setFechaHoraInicio(LocalDateTime.parse(inicioStr.replace(" ", "T")));
+            }
+            
+            String finStr = rs.getString("fecha_hora_fin");
+            if (finStr != null) {
+                reserva.setFechaHoraFin(LocalDateTime.parse(finStr.replace(" ", "T")));
+            }
+            
+            reserva.setEstado(EstadoReserva.valueOf(rs.getString("estado")));
+            reserva.setCodigoCancelacion(rs.getString("codigo_cancelacion"));
+            
+            lista.add(reserva);
+            hayMas = rs.next();
+        }
+    } catch (SQLException e) {
+        System.err.println("Error al obtener todas las reservas: " + e.getMessage());
+    }
+    
+    List<Reserva> resultadoFinal = lista;
+    return resultadoFinal;
+}
 }

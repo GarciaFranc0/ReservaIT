@@ -17,6 +17,10 @@ public class Servicio {
         this.activo = activo;
     }
 
+    public Servicio() {
+        //TODO Auto-generated constructor stub
+    }
+
     public int getId() {
         return id;
     }
@@ -39,5 +43,25 @@ public class Servicio {
 
     public boolean isActivo() {
         return activo;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public void setDuracionMinutos(int duracionMinutos) {
+        this.duracionMinutos = duracionMinutos;
+    }
+
+    public void setPrecio(double precio) {
+        this.precio = precio;
     }
 }

@@ -15,7 +15,6 @@ public class Reserva {
         this.estado = EstadoReserva.PENDIENTE;
     }
 
-    // Constructor completo para crear reservas desde la aplicacion
     public Reserva(int id, int clienteId, int servicioId, LocalDateTime fechaHoraInicio, LocalDateTime fechaHoraFin, EstadoReserva estado, String codigoCancelacion) {
         this.id = id;
         this.clienteId = clienteId;

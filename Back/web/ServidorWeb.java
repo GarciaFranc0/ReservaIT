@@ -2,7 +2,10 @@ package Back.web;
 
 import Back.modelo.EstadoReserva;
 import Back.modelo.Reserva;
+import Back.modelo.Servicio;
 import Back.modelo.Usuario;
+import Back.dao.ReservaDAO;
+import Back.dao.ServicioDAO;
 import Back.dao.UsuarioDAO;
 import Back.servicio.ReservaService;
 import com.sun.net.httpserver.HttpServer;
@@ -32,6 +35,8 @@ public class ServidorWeb {
         servidor.createContext("/api/horarios", new HorariosHandler());
         servidor.createContext("/api/reservas", new ReservasHandler());
         servidor.createContext("/api/cancelar", new CancelarHandler());
+        servidor.createContext("/api/listar", new ListarHandler());
+        servidor.createContext("/api/servicios", new ServiciosHandler());
         
         servidor.setExecutor(null);
         servidor.start();
@@ -207,6 +212,92 @@ public class ServidorWeb {
                     
                     exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
                     exchange.sendResponseHeaders(200, respuesta.length);
+                    OutputStream os = exchange.getResponseBody();
+                    os.write(respuesta);
+                    os.close();
+                }
+            }
+            return;
+        }
+    }
+
+    static class ListarHandler implements HttpHandler {
+        private final ReservaDAO reservaDAO = new ReservaDAO();
+
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            agregarCorsHeaders(exchange);
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                exchange.sendResponseHeaders(204, -1);
+            } else {
+                List<Reserva> lista = reservaDAO.obtenerTodas();
+                
+                StringBuilder json = new StringBuilder("[");
+                int i = 0;
+                while (i < lista.size()) {
+                    Reserva r = lista.get(i);
+                    json.append("{");
+                    json.append("\"id\":").append(r.getId()).append(",");
+                    json.append("\"inicio\":\"").append(r.getFechaHoraInicio()).append("\",");
+                    json.append("\"estado\":\"").append(r.getEstado()).append("\",");
+                    json.append("\"codigo\":\"").append(r.getCodigoCancelacion()).append("\"");
+                    json.append("}");
+                    if (i < lista.size() - 1) {
+                        json.append(",");
+                    }
+                    i++;
+                }
+                json.append("]");
+
+                byte[] respuesta = json.toString().getBytes(StandardCharsets.UTF_8);
+                exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
+                exchange.sendResponseHeaders(200, respuesta.length);
+                OutputStream os = exchange.getResponseBody();
+                os.write(respuesta);
+                os.close();
+            }
+            return;
+        }
+    }
+
+    static class ServiciosHandler implements HttpHandler {
+        private final ServicioDAO servicioDAO = new ServicioDAO();
+
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            agregarCorsHeaders(exchange);
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                exchange.sendResponseHeaders(204, -1);
+            } else {
+                try {
+                    List<Servicio> lista = servicioDAO.obtenerTodos();
+                    
+                    StringBuilder json = new StringBuilder("[");
+                    int i = 0;
+                    while (i < lista.size()) {
+                        Servicio s = lista.get(i);
+                        json.append("{");
+                        json.append("\"id\":").append(s.getId()).append(",");
+                        json.append("\"nombre\":\"").append(s.getNombre()).append("\"");
+                        json.append("}");
+                        if (i < lista.size() - 1) {
+                            json.append(",");
+                        }
+                        i++;
+                    }
+                    json.append("]");
+
+                    byte[] respuesta = json.toString().getBytes(StandardCharsets.UTF_8);
+                    exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
+                    exchange.sendResponseHeaders(200, respuesta.length);
+                    OutputStream os = exchange.getResponseBody();
+                    os.write(respuesta);
+                    os.close();
+                } catch (Exception e) {
+                    e.printStackTrace(); 
+                    String errorMsg = "{\"error\": \"" + e.getMessage() + "\"}";
+                    byte[] respuesta = errorMsg.getBytes(StandardCharsets.UTF_8);
+                    exchange.sendResponseHeaders(500, respuesta.length);
                     OutputStream os = exchange.getResponseBody();
                     os.write(respuesta);
                     os.close();
