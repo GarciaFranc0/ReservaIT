@@ -49,14 +49,12 @@ async function enviarReserva(event, datosReserva) {
         
         if (resultado.exito) {
             const codigo = resultado.codigo;
-            // Guardamos el éxito y el código en el navegador
             localStorage.setItem("reservaExitosa", "true");
             localStorage.setItem("codigoReserva", codigo);
             localStorage.setItem("telefonoReserva", datosReserva.telefono);
             localStorage.setItem("nombreReserva", datosReserva.nombre);
             localStorage.setItem("fechaReserva", datosReserva.fechaHoraInicio);
 
-            // Dejamos que recargue si quiere, pero ahora los datos están seguros
             location.reload();
         } else {
             alert("No se pudo completar la reserva. El horario ya no está disponible.");
@@ -100,7 +98,6 @@ const btnEnviar = document.getElementById('btn-enviar-reserva');
 if (btnEnviar) {
     btnEnviar.addEventListener('click', function(e) {
         console.log("--> 1. El botón fue presionado, la página NO debería recargarse.");
-        debugger;
         const datosReserva = {
             nombre: document.getElementById('input-nombre').value,
             apellido: document.getElementById('input-apellido').value,
@@ -124,41 +121,33 @@ if (btnCancelar) {
         }
     });
 }
-    async function cargarReservas() {
+async function cargarReservas() {
     try {
         const respuesta = await fetch('http://localhost:8080/api/listar');
         const reservas = await respuesta.json();
 
-        const tbody = document.querySelector('table tbody') || document.querySelector('table');
+        const tbody = document.getElementById('cuerpo-tabla-reservas');
+        
         if (tbody) {
-            let html = `
-                <tr>
-                    <th>Código</th>
-                    <th>Fecha y Hora</th>
-                    <th>Estado</th>
-                    <th>Acción</th>
-                </tr>
-            `;
-
-            let i = 0;
-            while (i < reservas.length) {
-                const r = reservas[i];
-                
-                if (r.estado === 'CANCELADO') { i++; continue; }
-                
+            let html = '';
+            
+            reservas.forEach(r => {
+                console.log("Objeto reserva completo:", r);
+                if (r.estado === 'CANCELADO') return;
 
                 html += `
                     <tr>
                         <td>${r.codigo}</td>
                         <td>${r.inicio}</td>
+                        <td>${r.nombreServicio}</td>
                         <td>${r.estado}</td>
                         <td>
-                            ${r.estado === 'CONFIRMADA' ? `<button onclick="cancelarReserva('${r.codigo}')">Cancelar</button>` : 'N/A'}
+                            ${r.estado === 'CONFIRMADA' ? `<button class="btn-cancelar" onclick="cancelarReserva('${r.codigo}')">Cancelar</button>` : 'N/A'}
                         </td>
                     </tr>
                 `;
-                i++;
-            }
+            });
+            
             tbody.innerHTML = html;
         }
     } catch (error) {
@@ -193,6 +182,8 @@ async function cargarServicios() {
     try {
         const respuesta = await fetch('http://localhost:8080/api/servicios');
         const servicios = await respuesta.json();
+
+        console.log("Servicios recibidos del backend:", servicios);
         
         const select = document.getElementById('select-servicio');
         if (select) {
@@ -246,6 +237,13 @@ function enviarWhatsApp(datos, codigo) {
     
     bannerWpp.style.display = 'block';
 }
+function obtenerNombreCancha(idServicio) {
+    const id = Number(idServicio);
+    if (id === 1) return "Cancha de Sintético";
+    if (id === 2) return "Cancha de Futsal";
+    if (id === 3) return "Cancha de Cesped Natural";
+    return "Cancha Principal";
+}
 
 window.cancelarReserva = async function(codigo) {
     console.log("¡Se hizo clic en cancelar para el código:", codigo); 
@@ -277,21 +275,22 @@ document.getElementById('select-servicio').addEventListener('change', cargarHora
 window.cancelarReservaDesdeTabla = cancelarReservaDesdeTabla;
 
 window.addEventListener('DOMContentLoaded', () => {
-    cargarServicios();
-    cargarReservas();
-});
+    if (typeof cargarServicios === 'function') cargarServicios();
+    if (typeof cargarReservas === 'function') cargarReservas();
 
-document.addEventListener("DOMContentLoaded", function() {
-    if (localStorage.getItem("reservaExitosa") === "true") {
-        const codigo = localStorage.getItem("codigoReserva");
-        const telefono = localStorage.getItem("telefonoReserva");
-        const nombre = localStorage.getItem("nombreReserva");
-        const fechaHora = localStorage.getItem("fechaReserva");
+    try {
+        if (localStorage.getItem("reservaExitosa") === "true") {
+            const codigo = localStorage.getItem("codigoReserva");
+            const telefono = localStorage.getItem("telefonoReserva");
+            const nombre = localStorage.getItem("nombreReserva");
+            const fechaHora = localStorage.getItem("fechaReserva");
 
-        // Dibujamos el banner flotante de WhatsApp
-        enviarWhatsApp({ nombre, telefono, fechaHoraInicio: fechaHora }, codigo);
-
-        // Limpiamos el localStorage para que el banner no vuelva a aparecer si recargas la página manualmente después
-        localStorage.removeItem("reservaExitosa");
+            if (codigo && telefono) {
+                enviarWhatsApp({ nombre, telefono, fechaHoraInicio: fechaHora }, codigo);
+            }
+            localStorage.removeItem("reservaExitosa");
+        }
+    } catch (e) {
+        console.error("Error al restaurar el banner de WhatsApp:", e);
     }
 });

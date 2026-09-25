@@ -62,34 +62,27 @@ public class ServicioDAO {
    public List<Servicio> obtenerTodos() {
     List<Servicio> lista = new ArrayList<>();
     String sql = "SELECT id, nombre, duracion_minutos, precio, descripcion FROM servicios";
-    
+
     try (Connection conn = ConexionBD.obtenerConexion();
          Statement stmt = conn.createStatement();
          ResultSet rs = stmt.executeQuery(sql)) {
-        
-        boolean hayMas = rs.next();
-        while (hayMas) {
+
+        while (rs.next()) {
             Servicio servicio = new Servicio();
             servicio.setId(rs.getInt("id"));
             servicio.setNombre(rs.getString("nombre"));
             servicio.setDuracionMinutos(rs.getInt("duracion_minutos"));
             servicio.setPrecio(rs.getDouble("precio"));
             
-            // Asegurarnos de mapear la descripción si la columna existe
             try {
                 servicio.setDescripcion(rs.getString("descripcion"));
-            } catch (Exception e) {
-                // Por si acaso la columna no viniera en el result set
-            }
-            
+            } catch (Exception e) {}
+
             lista.add(servicio);
-            hayMas = rs.next();
         }
     } catch (SQLException e) {
         System.err.println("Error al obtener los servicios: " + e.getMessage());
     }
-    
-    List<Servicio> resultadoFinal = lista;
-    return resultadoFinal;
+    return lista;
 }
 }

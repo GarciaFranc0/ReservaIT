@@ -10,6 +10,8 @@ public class Reserva {
     private LocalDateTime fechaHoraFin;
     private EstadoReserva estado;
     private String codigoCancelacion;
+    private String nombreServicio;
+
 
     public Reserva() {
         this.estado = EstadoReserva.PENDIENTE;
@@ -80,4 +82,13 @@ public class Reserva {
     public void setCodigoCancelacion(String codigoCancelacion) {
         this.codigoCancelacion = codigoCancelacion;
     }
+    
+    public String getNombreServicio() {
+        return nombreServicio;
+    }
+
+    public void setNombreServicio(String nombreServicio) {
+        this.nombreServicio = nombreServicio;
+    }
+
 }

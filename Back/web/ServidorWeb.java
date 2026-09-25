@@ -238,10 +238,12 @@ public class ServidorWeb {
                     Reserva r = lista.get(i);
                     json.append("{");
                     json.append("\"id\":").append(r.getId()).append(",");
-                    json.append("\"inicio\":\"").append(r.getFechaHoraInicio()).append("\",");
-                    json.append("\"estado\":\"").append(r.getEstado()).append("\",");
-                    json.append("\"codigo\":\"").append(r.getCodigoCancelacion()).append("\"");
+                    json.append("\"inicio\":\"").append(r.getFechaHoraInicio() != null ? r.getFechaHoraInicio() : "").append("\",");
+                    json.append("\"estado\":\"").append(r.getEstado() != null ? r.getEstado() : "").append("\",");
+                    json.append("\"codigo\":\"").append(r.getCodigoCancelacion() != null ? r.getCodigoCancelacion() : "").append("\",");
+                    json.append("\"nombreServicio\":\"").append(r.getNombreServicio() != null ? r.getNombreServicio() : "Cancha Principal").append("\"");
                     json.append("}");
+
                     if (i < lista.size() - 1) {
                         json.append(",");
                     }
