@@ -10,6 +10,7 @@ Proyecto web full-stack desarrollado desde cero para la gestión integral de res
 * **Despliegue y Pruebas:** Ngrok.
 
 📂 Estructura del Proyecto
+```text
 ReservaIT/
 │
 ├── Back/           # Lógica de conexión a base de datos y controladores
@@ -18,7 +19,7 @@ ReservaIT/
 ├── lib/            # Librerías externas (JDBC SQLite, etc.)
 ├── db.db           # Archivo de la base de datos SQLite
 └── Main.java       # Punto de entrada y configuración del servidor HTTP nativo
-
+```
 ✨ Características Principales
 * Servidor HTTP nativo en Java que maneja tanto las rutas de la API REST como la entrega de archivos estáticos.
 
