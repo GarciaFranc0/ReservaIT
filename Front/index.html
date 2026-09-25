@@ -6,6 +6,11 @@
     <title>ReservaIT</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
+<header class="main-header">
+    <h1>⚽ ReservaIT</h1>
+    <p>Sistema de Gestión y Alquiler de Complejo Deportivo</p>
+</header>
 <body>
     <div class="form-container">
     <h2>Reservar Turno</h2>
@@ -32,27 +37,29 @@
     <select id="select-horarios" required></select>
 
     <button type="button" id="btn-enviar-reserva">Confirmar Reserva</button>
-</div>
+    </div>
 
 
-    <h3>Reservas Registradas</h3>
-    <table id="tabla-reservas">
-        <thead>
-            <tr>
-                <th>Código</th>
-                <th>Fecha y Hora</th>
-                <th>Cancha</th>
-                <th>Estado</th>
-                <th>Acción</th>
-            </tr>
-        </thead>
-        <tbody id="cuerpo-tabla-reservas">
-        </tbody>
-    </table>
+    <div class="tabla-container">
+        <h3>Reservas Registradas</h3>
+        <table id="tabla-reservas">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Fecha y Hora</th>
+                    <th>Cancha</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="cuerpo-tabla-reservas">
+            </tbody>
+        </table>
 
-    <h3>Cancelar una Reserva</h3>
-    <input type="text" id="input-codigo-cancelar" placeholder="Código de cancelación">
-    <button id="btn-cancelar">Cancelar Turno</button>
+        <h3 style="margin-top: 25px;">Cancelar una Reserva</h3>
+        <input type="text" id="input-codigo-cancelar" placeholder="Código de cancelación">
+        <button id="btn-cancelar">Cancelar Turno</button>
+    </div>
 
     
     <div id="contenedor-whatsapp" style="display: none; margin: 20px 0; padding: 15px; background: #e6f4ea; border-radius: 8px;">
@@ -62,6 +69,9 @@
     </a>
     </div>
 
+    <footer class="main-footer">
+    <p>Desarrollado con Java Nativo (HttpHandlers) & Frontend Vanilla | Proyecto Integrador</p>
+    </footer>
     <script src="script.js"></script>
 </body>
 </html>
