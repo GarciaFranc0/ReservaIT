@@ -13,6 +13,7 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,6 +26,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.UUID;
 
 public class ServidorWeb {
@@ -37,6 +39,70 @@ public class ServidorWeb {
         servidor.createContext("/api/cancelar", new CancelarHandler());
         servidor.createContext("/api/listar", new ListarHandler());
         servidor.createContext("/api/servicios", new ServiciosHandler());
+        servidor.createContext("/", new HttpHandler() {
+            @Override
+            public void handle(HttpExchange exchange) throws IOException {
+                File archivoHtml = new File("Front/index.html");
+                if (!archivoHtml.exists()) {
+                    archivoHtml = new File("index.html");
+                }
+                
+                byte[] bytes = Files.readAllBytes(archivoHtml.toPath());
+                exchange.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
+                exchange.sendResponseHeaders(200, bytes.length);
+                OutputStream os = exchange.getResponseBody();
+                os.write(bytes);
+                os.close();
+            }
+        });
+
+    servidor.createContext("/styles.css", new HttpHandler() {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            File file = new File("Front/styles.css");
+            byte[] bytes = Files.readAllBytes(file.toPath());
+            exchange.getResponseHeaders().set("Content-Type", "text/css; charset=UTF-8");
+            exchange.sendResponseHeaders(200, bytes.length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(bytes);
+            os.close();
+        }
+    });
+
+
+    servidor.createContext("/script.js", new HttpHandler() {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            File file = new File("Front/script.js");
+            byte[] bytes = Files.readAllBytes(file.toPath());
+            exchange.getResponseHeaders().set("Content-Type", "application/javascript; charset=UTF-8");
+            exchange.sendResponseHeaders(200, bytes.length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(bytes);
+            os.close();
+        }
+    });
+
+    servidor.createContext("/img/", new HttpHandler() {
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+        String rutaPeticion = exchange.getRequestURI().getPath(); // 
+        File archivoImg = new File("." + rutaPeticion);
+        
+
+        if (archivoImg.exists() && !archivoImg.isDirectory()) {
+            byte[] bytes = Files.readAllBytes(archivoImg.toPath());
+            exchange.getResponseHeaders().set("Content-Type", "image/jpeg");
+            exchange.sendResponseHeaders(200, bytes.length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(bytes);
+            os.close();
+        } else {
+            System.out.println("❌ ¡No se encontró el archivo en esa ruta!");
+            exchange.sendResponseHeaders(404, -1);
+        }
+    }
+});
         
         servidor.setExecutor(null);
         servidor.start();

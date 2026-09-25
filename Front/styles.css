@@ -178,7 +178,7 @@ table button:hover {
 }
 
 body {
-    background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), 
+    background:  linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
                 url('../img/imagenMessi.jpg') no-repeat center center fixed;
     background-size: cover;
     margin: 0;

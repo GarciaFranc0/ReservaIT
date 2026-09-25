@@ -9,7 +9,7 @@ async function cargarHorarios() {
     const duracion = 60;
 
     try {
-        const respuesta = await fetch(`http://localhost:8080/api/horarios?servicioId=${servicioId}&fecha=${fecha}&duracion=${duracion}`);
+        const respuesta = await fetch(`/api/horarios?servicioId=${servicioId}&fecha=${fecha}&duracion=${duracion}`);
         const horarios = await respuesta.json();
         
         const select = document.getElementById('select-horarios');
@@ -36,7 +36,7 @@ async function enviarReserva(event, datosReserva) {
     }
 
     try {
-        const respuesta = await fetch('http://localhost:8080/api/reservas', {
+        const respuesta = await fetch('/api/reservas', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -71,7 +71,7 @@ async function cancelarReserva(codigo) {
         return;
     }
     try {
-        const respuesta = await fetch(`http://localhost:8080/api/cancelar?codigo=${codigo}`, {
+        const respuesta = await fetch(`/api/cancelar?codigo=${codigo}`, {
             method: 'POST'
         }); 
         const resultado = await respuesta.json();
@@ -123,7 +123,7 @@ if (btnCancelar) {
 }
 async function cargarReservas() {
     try {
-        const respuesta = await fetch('http://localhost:8080/api/listar');
+        const respuesta = await fetch('/api/listar');
         const reservas = await respuesta.json();
 
         const tbody = document.getElementById('cuerpo-tabla-reservas');
@@ -161,7 +161,7 @@ async function cancelarReservaDesdeTabla(codigo) {
     }
 
     try {
-        const respuesta = await fetch(`http://localhost:8080/api/cancelar?codigo=${codigo}`, {
+        const respuesta = await fetch(`/api/cancelar?codigo=${codigo}`, {
             method: 'POST'
         });
         
@@ -180,7 +180,7 @@ async function cancelarReservaDesdeTabla(codigo) {
 
 async function cargarServicios() {
     try {
-        const respuesta = await fetch('http://localhost:8080/api/servicios');
+        const respuesta = await fetch('/api/servicios');
         const servicios = await respuesta.json();
 
         console.log("Servicios recibidos del backend:", servicios);
@@ -253,7 +253,7 @@ window.cancelarReserva = async function(codigo) {
     }
 
     try {
-        const respuesta = await fetch(`http://localhost:8080/api/cancelar?codigo=${codigo}`, {
+        const respuesta = await fetch(`/api/cancelar?codigo=${codigo}`, {
             method: 'POST'
         });
         
