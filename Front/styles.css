@@ -176,3 +176,18 @@ table button:hover {
 #btn-enviar-reserva:hover {
     background-color: #1ebd5a;
 }
+
+body {
+    background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), 
+                url('../img/imagenMessi.jpg') no-repeat center center fixed;
+    background-size: cover;
+    margin: 0;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+h2, h3, h1 {
+    color: #ffffff;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8); /* Sombra oscura para que resalte con cualquier fondo */
+    text-align: center;
+}
